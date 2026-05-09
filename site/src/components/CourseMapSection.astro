@@ -1,26 +1,30 @@
 ---
 import CourseMap from "./CourseMap";
+import { RUNS } from "../lib/data";
+
+const r = RUNS[2026];
 ---
 
 <section class="section topo">
   <div class="wrap">
     <p class="eyebrow">The course · Hamelin Bay → Howard Park</p>
-    <h2 class="h2">Three lines, one coast.</h2>
+    <h2 class="h2">One coast, six checkpoints.</h2>
     <p class="prose muted">
-      The route is the same every year: northbound along the Cape&nbsp;to&nbsp;Cape
-      track. Look closely and you will see slight reroutes year to year as
-      track conditions change.
+      The route starts on the white sand at Hamelin Bay and runs the length
+      of the Cape&nbsp;to&nbsp;Cape Track north to Howard Park Wines. Same
+      course every year.
     </p>
   </div>
 
   <div class="map-frame wrap-wide">
     <div class="map-host">
-      <CourseMap client:load geojsonUrl="/data/tracks.geojson" />
-    </div>
-    <div class="legend wrap">
-      <span class="key" style="--c: var(--c-2024);"><i></i><span class="num">2024</span></span>
-      <span class="key" style="--c: var(--c-2025);"><i></i><span class="num">2025</span></span>
-      <span class="key" style="--c: var(--c-2026);"><i></i><span class="num">2026</span></span>
+      <CourseMap
+        client:load
+        geojsonUrl="/data/tracks.geojson"
+        aidStations={r.aidStations}
+        routeColor="#3F5C3A"
+        year={2026}
+      />
     </div>
   </div>
 </section>
@@ -81,22 +85,6 @@ import CourseMap from "./CourseMap";
   .map-host {
     background: var(--paper-deep);
     border: 1px solid var(--rule);
-    border-radius: 2px;
-  }
-  .legend {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: flex-start;
-    margin-top: 0.85rem;
-    padding-left: 0;
-    padding-right: 0;
-  }
-  .key { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--ink-muted); letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; }
-  .key i {
-    width: 18px;
-    height: 3px;
-    background: var(--c);
-    display: inline-block;
     border-radius: 2px;
   }
 </style>

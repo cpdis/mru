@@ -198,7 +198,19 @@ type YearOutput = {
     gainM: number;
     lossM: number;
   }[];
+  // Aid station coordinates snapped from the actual run trackpoints, so
+  // map markers land on the trail rather than at hand‑typed coords.
+  aidStations: { name: string; km: number; lat: number; lon: number }[];
 };
+
+const AID_STATIONS = [
+  { name: "Hamelin Bay", km: 0 },
+  { name: "Boranup Campsite", km: 11.5 },
+  { name: "Contos Campground", km: 27.5 },
+  { name: "Riflebutts Reserve", km: 47.0 },
+  { name: "Gracetown", km: 65.5 },
+  { name: "Howard Park Wines", km: 78.5 },
+];
 
 function processYear(input: YearInputs): { summary: YearOutput; line: Pt[] } {
   // 1. Parse and stitch.
@@ -295,6 +307,27 @@ function processYear(input: YearInputs): { summary: YearOutput; line: Pt[] } {
   const avgHr = allHr.length ? Math.round(mean(allHr)) : null;
   const maxHr = allHr.length ? Math.max(...allHr) : null;
 
+  // 6b. Snap each aid station to the closest trackpoint by cumulative distance.
+  const aidStations = AID_STATIONS.map(({ name, km }) => {
+    const targetM = km * 1000;
+    let bestIdx = 0;
+    let bestDelta = Infinity;
+    for (let i = 0; i < cum.length; i++) {
+      const d = Math.abs(cum[i] - targetM);
+      if (d < bestDelta) {
+        bestDelta = d;
+        bestIdx = i;
+      }
+    }
+    const p = stitched[bestIdx];
+    return {
+      name,
+      km,
+      lat: +p.lat.toFixed(6),
+      lon: +p.lon.toFixed(6),
+    };
+  });
+
   const startSec = stitched[0].t;
   const endSec = stitched[stitched.length - 1].t;
   const elapsed = endSec - startSec;
@@ -326,6 +359,7 @@ function processYear(input: YearInputs): { summary: YearOutput; line: Pt[] } {
       gainM: Math.round(l.gain),
       lossM: Math.round(l.loss),
     })),
+    aidStations,
   };
 
   // 7. Simplified line for the map (~5m tolerance keeps shape, drops to ~1500 pts).

@@ -126,6 +126,11 @@ a {
   margin: 0 0 1.5rem;
 }
 
+.lede strong {
+  font-weight: 700;
+  font-variation-settings: "opsz" 144;
+}
+
 .prose {
   max-width: 60ch;
   font-size: 1.05rem;

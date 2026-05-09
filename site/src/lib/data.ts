@@ -42,6 +42,7 @@ export type YearData = {
   watchReset?: { km: number; isoUtc: string };
   km: KmBin[];
   legs: LegSummary[];
+  aidStations: { name: string; km: number; lat: number; lon: number }[];
 };
 
 export const YEARS = [2024, 2025, 2026] as const;
