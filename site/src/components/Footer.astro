@@ -1,0 +1,41 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="section foot">
+  <div class="wrap">
+    <hr class="rule" />
+    <div class="grid">
+      <div>
+        <p class="num eyebrow">Sources</p>
+        <ul>
+          <li><a href="https://margaretriver.rapidascent.com.au/event-details/the-race/course-description-and-maps/" target="_blank" rel="noopener">Official course description</a></li>
+          <li>Garmin Connect GPX exports (2024, 2025, 2026)</li>
+          <li>Map tiles: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> · OSM contributors</li>
+        </ul>
+      </div>
+      <div>
+        <p class="num eyebrow">Built</p>
+        <ul>
+          <li>Astro, React, MapLibre GL, Observable Plot</li>
+          <li>Type: Fraunces, Geist, Geist Mono</li>
+          <li>Source: <a href="https://github.com/cpdis" target="_blank" rel="noopener">github.com/cpdis</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="muted small">© {year} Colin Dismuke · run, not raced.</p>
+  </div>
+</footer>
+
+<style>
+  .foot { padding: 4rem 0 5rem; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 2rem 3rem;
+    margin: 1rem 0 3rem;
+  }
+  ul { list-style: none; padding: 0; margin: 0; font-size: 0.92rem; line-height: 1.7; }
+  ul a { text-decoration: underline; }
+  .small { font-size: 0.78rem; }
+</style>

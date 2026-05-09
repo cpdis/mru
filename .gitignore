@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.astro/
+.vercel/
+.DS_Store
+*.log
+.env
+.env.local
+.playwright-mcp/
+
+# Preprocessed run data is generated from the GPX files at build time;
+# committing it would just create merge churn.
+site/public/data/*.json
+site/public/data/*.geojson
+!site/public/data/.gitkeep

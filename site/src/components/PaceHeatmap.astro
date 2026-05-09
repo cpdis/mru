@@ -1,0 +1,194 @@
+---
+import { RUNS, YEARS } from "../lib/data";
+import { LEGS } from "../data/course";
+import { fmtPace } from "../lib/format";
+
+// Aggregate pace across all years to compute a shared color scale.
+const allPaces = YEARS.flatMap((y) => RUNS[y].km.map((b) => b.pace_s_per_km));
+const sorted = [...allPaces].sort((a, b) => a - b);
+// Clip to 5–95th percentiles so a single 0‑pace blip does not flatten the scale.
+const lo = sorted[Math.floor(sorted.length * 0.05)];
+const hi = sorted[Math.floor(sorted.length * 0.95)];
+
+const KM_TOTAL = 80;
+
+function color(p: number): string {
+  // Faster (low pace) → green. Slower (high pace) → ochre/red.
+  // Interpolate through forest → ochre → brick.
+  const t = Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
+  // 3‑stop interpolation
+  const stops: [number, [number, number, number]][] = [
+    [0.0, [63, 92, 58]], // forest
+    [0.5, [197, 168, 90]], // sand
+    [1.0, [165, 70, 50]], // brick
+  ];
+  for (let i = 0; i < stops.length - 1; i++) {
+    const [t0, c0] = stops[i];
+    const [t1, c1] = stops[i + 1];
+    if (t <= t1) {
+      const k = (t - t0) / (t1 - t0);
+      const r = Math.round(c0[0] + (c1[0] - c0[0]) * k);
+      const g = Math.round(c0[1] + (c1[1] - c0[1]) * k);
+      const b = Math.round(c0[2] + (c1[2] - c0[2]) * k);
+      return `rgb(${r} ${g} ${b})`;
+    }
+  }
+  return "rgb(165 70 50)";
+}
+
+// Build a fixed‑length array per year padded with nulls so all rows align.
+function paceAt(year: number, km: number): number | null {
+  const bin = RUNS[year as 2024 | 2025 | 2026].km.find((b) => b.km === km);
+  return bin ? bin.pace_s_per_km : null;
+}
+
+const cols = Array.from({ length: KM_TOTAL }, (_, i) => i + 1);
+
+const ticks = [0, 11.5, 27.5, 47, 65.5, 78.5, 80];
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Pace heatmap · 80 columns</p>
+    <h2 class="h2">Every kilometre, every year.</h2>
+    <p class="prose muted">
+      Each cell is one kilometre. Greener is faster, redder is slower. The deep
+      ochre stretch around km 41–47 is the soft‑sand beach into Riflebutts,
+      followed by the quiet greens of Leg 5 — that's the transformation.
+    </p>
+
+    <div class="heat">
+      {YEARS.map((y) => (
+        <div class="row">
+          <div class="row-label" style={`--c: var(--c-${y});`}>
+            <span class="num">{y}</span>
+          </div>
+          <div class="cells">
+            {cols.map((k) => {
+              const p = paceAt(y, k);
+              return (
+                <div
+                  class="cell"
+                  style={p === null ? "background: var(--paper-deep);" : `background: ${color(p)};`}
+                  title={p === null ? `km ${k} · no data` : `km ${k} · ${fmtPace(p)}/km`}
+                />
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      <div class="axis">
+        <div class="row-label"></div>
+        <div class="ticks">
+          {ticks.map((t) => (
+            <div class="tick" style={`--at: ${(t / KM_TOTAL) * 100}%;`}>
+              <span class="num">{t}</span>
+            </div>
+          ))}
+          <div class="legbar">
+            {LEGS.map((l) => {
+              const start = l.index === 1 ? 0 : LEGS[l.index - 2].cumulativeKm;
+              return (
+                <div
+                  class="legseg"
+                  style={`left: ${(start / KM_TOTAL) * 100}%; width: ${((l.cumulativeKm - start) / KM_TOTAL) * 100}%;`}
+                >
+                  <span>L{l.index} · {l.name}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span class="num">Faster</span>
+        <div class="grad"></div>
+        <span class="num">Slower</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .heat {
+    margin-top: 2.5rem;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.4rem;
+  }
+  .row-label {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    color: var(--c);
+    font-weight: 600;
+  }
+  .cells {
+    display: grid;
+    grid-template-columns: repeat(80, 1fr);
+    gap: 1px;
+    height: 2rem;
+  }
+  .cell {
+    height: 100%;
+    border-radius: 1px;
+  }
+
+  .axis { display: grid; grid-template-columns: 4rem 1fr; gap: 0.75rem; margin-top: 0.6rem; }
+  .ticks { position: relative; height: 2.6rem; }
+  .tick {
+    position: absolute;
+    left: var(--at);
+    top: 0;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+    font-family: var(--mono);
+    border-left: 1px solid var(--rule);
+    padding-left: 4px;
+  }
+  .legbar {
+    position: absolute;
+    inset: 1.4rem 0 auto 0;
+    height: 1rem;
+  }
+  .legseg {
+    position: absolute;
+    height: 100%;
+    border-left: 1px solid var(--ink-muted);
+    padding: 1px 4px 0;
+    font-size: 0.65rem;
+    font-family: var(--mono);
+    color: var(--ink-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .legseg:last-child { border-right: 1px solid var(--ink-muted); }
+
+  .legend {
+    margin-top: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+  }
+  .grad {
+    flex: 0 0 16rem;
+    height: 0.4rem;
+    background: linear-gradient(to right, rgb(63 92 58), rgb(197 168 90), rgb(165 70 50));
+    border-radius: 1px;
+  }
+
+  @media (max-width: 640px) {
+    .row, .axis { grid-template-columns: 2.5rem 1fr; }
+    .legseg { font-size: 0.55rem; }
+  }
+</style>

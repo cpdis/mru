@@ -1,0 +1,41 @@
+---
+import "../styles/global.css";
+import Hero from "../components/Hero.astro";
+import HeadlineNumbers from "../components/HeadlineNumbers.astro";
+import CourseMapSection from "../components/CourseMapSection.astro";
+import LegSplits from "../components/LegSplits.astro";
+import PaceHeatmap from "../components/PaceHeatmap.astro";
+import HrSection from "../components/HrSection.astro";
+import SunriseStrip from "../components/SunriseStrip.astro";
+import TempStrip from "../components/TempStrip.astro";
+import ElevationSection from "../components/ElevationSection.astro";
+import WatchReset from "../components/WatchReset.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Three years of the Margaret River Ultra · Colin Dismuke</title>
+    <meta
+      name="description"
+      content="A look at three runs of the 80‑kilometre Margaret River Ultra Marathon, kilometre by kilometre, heart beat by heart beat."
+    />
+  </head>
+  <body>
+    <Hero />
+    <HeadlineNumbers />
+    <CourseMapSection />
+    <LegSplits />
+    <PaceHeatmap />
+    <HrSection />
+    <SunriseStrip />
+    <TempStrip />
+    <ElevationSection />
+    <WatchReset />
+    <Footer />
+  </body>
+</html>

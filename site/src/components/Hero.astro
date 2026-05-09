@@ -1,0 +1,112 @@
+---
+import { RUNS } from "../lib/data";
+import { fmtElapsed } from "../lib/format";
+
+const r24 = RUNS[2024];
+const r25 = RUNS[2025];
+const r26 = RUNS[2026];
+---
+
+<section class="hero topo">
+  <div class="wrap">
+    <p class="eyebrow">Margaret River Ultra Marathon · Hamelin Bay → Howard Park · 80&nbsp;km</p>
+
+    <h1 class="display">
+      <span class="line line-1">Three</span>
+      <span class="line line-2">years on the</span>
+      <span class="line line-3">Cape&nbsp;to&nbsp;Cape.</span>
+    </h1>
+
+    <div class="counter" role="group" aria-label="Finish times by year">
+      <div class="cell" style="--c: var(--c-2024);">
+        <span class="year num">2024</span>
+        <span class="time num">{fmtElapsed(r24.elapsedSec)}</span>
+      </div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="cell" style="--c: var(--c-2025);">
+        <span class="year num">2025</span>
+        <span class="time num">{fmtElapsed(r25.elapsedSec)}</span>
+      </div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="cell" style="--c: var(--c-2026);">
+        <span class="year num">2026</span>
+        <span class="time num">{fmtElapsed(r26.elapsedSec)}</span>
+      </div>
+    </div>
+
+    <p class="lede">
+      Same course. Same average heart rate <span class="num">(163&nbsp;bpm)</span>.
+      Sixty‑five minutes faster.
+    </p>
+
+    <p class="prose muted">
+      The Margaret River Ultra is a 5‑leg, 80‑kilometre course from the white
+      sand at Hamelin Bay, through the karri forest and up the Cape to Cape
+      track to the wineries at Yallingup. This is a look at what changed across
+      three runs of it, second by second, kilometre by kilometre.
+    </p>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: clamp(5rem, 12vw, 9rem) 0 clamp(4rem, 8vw, 7rem);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .display {
+    font-size: clamp(3.25rem, 9vw, 7.5rem);
+    margin-bottom: 3rem;
+  }
+  .display .line {
+    display: block;
+  }
+  .display .line-2 {
+    margin-left: clamp(1rem, 4vw, 4rem);
+    font-style: normal;
+    font-weight: 300;
+  }
+  .display .line-3 {
+    color: var(--c-2026);
+  }
+
+  .counter {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(0.75rem, 2vw, 2rem);
+    flex-wrap: wrap;
+    margin: 0 0 2rem;
+  }
+  .cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-left: 3px solid var(--c);
+    padding-left: 0.85rem;
+  }
+  .year {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .time {
+    font-family: var(--mono);
+    font-feature-settings: "tnum" 1;
+    font-size: clamp(2.5rem, 6.5vw, 4.5rem);
+    font-weight: 500;
+    color: var(--c);
+    line-height: 1;
+  }
+  .arrow {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    color: var(--rule);
+  }
+  /* Hide arrows when the cells wrap to a new line so we don't end up with
+   * a trailing arrow next to nothing. */
+  @media (max-width: 720px) {
+    .arrow { display: none; }
+    .counter { gap: 1rem 1.25rem; }
+  }
+</style>

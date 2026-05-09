@@ -1,0 +1,34 @@
+---
+import HrCurtain from "./HrCurtain";
+import { RUNS, YEARS } from "../lib/data";
+
+const runs = YEARS.map((y) => RUNS[y]);
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Heart rate · per kilometre</p>
+    <h2 class="h2">Three years on the same engine.</h2>
+    <p class="prose muted">
+      The flat lines tell the story. Average HR settles into the same band
+      every year. What's different is how long that band stays elevated late
+      in the race, and how much the body can hold pace alongside it.
+    </p>
+
+    <div class="chart">
+      <HrCurtain client:visible runs={runs} />
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .hr-curtain {
+    width: 100%;
+    margin-top: 2rem;
+    border-top: 1px solid var(--rule);
+    padding-top: 1rem;
+  }
+  .hr-curtain svg, .elevation-profile svg {
+    color: var(--ink-muted);
+  }
+</style>

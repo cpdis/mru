@@ -1,0 +1,94 @@
+---
+import ElevationProfile from "./ElevationProfile";
+import { RUNS } from "../lib/data";
+import { LEGS, TOTAL_GAIN_M, TOTAL_LOSS_M } from "../data/course";
+
+const reference = RUNS[2026];
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">The shape of the course</p>
+    <h2 class="h2">{TOTAL_GAIN_M}&nbsp;m up. {TOTAL_LOSS_M}&nbsp;m down.</h2>
+    <p class="prose muted">
+      The profile looks gentle and the numbers back it up. The course is
+      energy‑sapping in a different way: variety. Roots, rocks, deep sand,
+      hard pack, beach. The trick is that the climbs are not where the time
+      hides.
+    </p>
+
+    <div class="chart">
+      <ElevationProfile client:visible reference={reference} />
+    </div>
+
+    <div class="legcards">
+      {LEGS.map((l) => (
+        <article class="card">
+          <header>
+            <span class="card-num num">L{l.index}</span>
+            <h3 class="card-title">{l.name}</h3>
+          </header>
+          <p class="card-route num muted">{l.from} → {l.to}</p>
+          <dl class="card-stats">
+            <div><dt>Distance</dt><dd class="num">{l.distanceKm} km</dd></div>
+            <div><dt>Cumulative</dt><dd class="num">{l.cumulativeKm} km</dd></div>
+            <div><dt>Up</dt><dd class="num">{l.gainM} m</dd></div>
+            <div><dt>Down</dt><dd class="num">{l.lossM} m</dd></div>
+          </dl>
+          <p class="card-terrain">{l.terrain}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .elevation-profile {
+    width: 100%;
+    margin-top: 1.5rem;
+  }
+</style>
+
+<style>
+  .legcards {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1.5rem;
+  }
+  .card {
+    border: 1px solid var(--rule);
+    background: rgba(255, 255, 255, 0.45);
+    padding: 1.25rem 1.25rem 1.5rem;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .card header { display: flex; align-items: baseline; gap: 0.65rem; }
+  .card-num {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+  .card-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.3rem;
+    margin: 0;
+    line-height: 1.15;
+  }
+  .card-route { font-size: 0.78rem; letter-spacing: 0.04em; }
+  .card-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem 1rem;
+    margin: 0.3rem 0 0.5rem;
+  }
+  .card-stats div { display: flex; justify-content: space-between; padding-top: 0.45rem; border-top: 1px solid var(--rule); }
+  .card-stats dt { font-size: 0.72rem; letter-spacing: 0.06em; color: var(--ink-muted); text-transform: uppercase; font-family: var(--mono); }
+  .card-stats dd { margin: 0; font-size: 0.95rem; font-weight: 500; }
+  .card-terrain { font-size: 0.92rem; line-height: 1.5; color: var(--ink); }
+</style>

@@ -1,0 +1,102 @@
+---
+import CourseMap from "./CourseMap";
+---
+
+<section class="section topo">
+  <div class="wrap">
+    <p class="eyebrow">The course · Hamelin Bay → Howard Park</p>
+    <h2 class="h2">Three lines, one coast.</h2>
+    <p class="prose muted">
+      The route is the same every year: northbound along the Cape&nbsp;to&nbsp;Cape
+      track. Look closely and you will see slight reroutes year to year as
+      track conditions change.
+    </p>
+  </div>
+
+  <div class="map-frame wrap-wide">
+    <div class="map-host">
+      <CourseMap client:load geojsonUrl="/data/tracks.geojson" />
+    </div>
+    <div class="legend wrap">
+      <span class="key" style="--c: var(--c-2024);"><i></i><span class="num">2024</span></span>
+      <span class="key" style="--c: var(--c-2025);"><i></i><span class="num">2025</span></span>
+      <span class="key" style="--c: var(--c-2026);"><i></i><span class="num">2026</span></span>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .course-map {
+    height: clamp(420px, 70vh, 720px);
+    width: 100%;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .maplibregl-ctrl-attrib {
+    background: rgba(245, 241, 232, 0.7);
+    font-family: var(--mono), ui-monospace, monospace;
+    font-size: 10px;
+  }
+  .aid-marker {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .aid-marker .aid-dot {
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(245, 241, 232, 0.95);
+  }
+  .aid-marker .aid-label {
+    font-family: "Geist", system-ui, sans-serif;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    background: rgba(245, 241, 232, 0.9);
+    border: 1px solid #c9c1ad;
+    padding: 2px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+  .aid-marker .aid-km {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-weight: 500;
+    color: #5a574e;
+    font-size: 0.65rem;
+  }
+</style>
+
+<style>
+  .map-frame {
+    margin-top: 2.5rem;
+    max-width: min(96rem, 100%);
+  }
+  .wrap-wide { padding: 0 var(--gutter); }
+  .map-host {
+    background: var(--paper-deep);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+  }
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: flex-start;
+    margin-top: 0.85rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .key { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--ink-muted); letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; }
+  .key i {
+    width: 18px;
+    height: 3px;
+    background: var(--c);
+    display: inline-block;
+    border-radius: 2px;
+  }
+</style>

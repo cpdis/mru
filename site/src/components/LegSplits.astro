@@ -1,0 +1,162 @@
+---
+import { RUNS, YEARS } from "../lib/data";
+import { LEGS } from "../data/course";
+import { fmtElapsedLong, fmtPace, fmtSignedMin } from "../lib/format";
+
+// Time per leg, normalized so all bars share the same time scale.
+const maxLegSec = Math.max(
+  ...YEARS.flatMap((y) => RUNS[y].legs.map((l) => l.elapsedSec))
+);
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Where the time went</p>
+    <h2 class="h2">Sixty‑five minutes, mostly in the back half.</h2>
+    <p class="prose muted">
+      Bars are scaled by elapsed time per leg. Read across to see how each leg
+      shrunk year over year. Legs 4 and 5 are where the real work shows up.
+    </p>
+
+    <div class="legs">
+      <div class="legs-head">
+        <div class="legname"></div>
+        {YEARS.map((y) => (
+          <div class="legyear" style={`--c: var(--c-${y});`}>{y}</div>
+        ))}
+      </div>
+
+      {LEGS.map((leg) => (
+        <div class="legrow">
+          <div class="legname">
+            <span class="leg-num num">L{leg.index}</span>
+            <div>
+              <div class="leg-title">{leg.name}</div>
+              <div class="leg-meta num muted">
+                {leg.distanceKm.toFixed(1)}&nbsp;km · {leg.gainM}&nbsp;m gain
+              </div>
+            </div>
+          </div>
+
+          {YEARS.map((y, yi) => {
+            const l = RUNS[y].legs[leg.index - 1];
+            const prev = yi === 0 ? null : RUNS[YEARS[yi - 1]].legs[leg.index - 1];
+            const w = (l.elapsedSec / maxLegSec) * 100;
+            return (
+              <div class="legbar" style={`--c: var(--c-${y});`}>
+                <div class="bar" style={`width: ${w}%;`}>
+                  <span class="bar-time num">{fmtElapsedLong(l.elapsedSec)}</span>
+                </div>
+                <div class="bar-meta num">
+                  <span>{fmtPace(l.avgPaceSecPerKm)}/km</span>
+                  <span class="dot">·</span>
+                  <span>{l.avgHr} bpm</span>
+                  {prev && (
+                    <span class={`diff ${l.elapsedSec < prev.elapsedSec ? "good" : "bad"}`}>
+                      {fmtSignedMin(l.elapsedSec - prev.elapsedSec)}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .legs {
+    margin-top: 2.5rem;
+    border-top: 1px solid var(--rule);
+  }
+  .legs-head, .legrow {
+    display: grid;
+    grid-template-columns: minmax(11rem, 1.1fr) repeat(3, 2fr);
+    gap: clamp(0.75rem, 2.5vw, 2rem);
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: center;
+  }
+  .legs-head {
+    padding: 0.6rem 0;
+    border-bottom-color: var(--ink);
+  }
+  .legyear {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--c);
+    font-weight: 600;
+  }
+  .legname {
+    display: flex;
+    gap: 0.85rem;
+    align-items: baseline;
+  }
+  .leg-num {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+  .leg-title {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-style: italic;
+    font-size: 1.15rem;
+    line-height: 1.2;
+  }
+  .leg-meta {
+    font-size: 0.78rem;
+    margin-top: 0.15rem;
+  }
+  .legbar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+  .bar {
+    background: var(--c);
+    color: var(--paper);
+    height: 2.1rem;
+    display: flex;
+    align-items: center;
+    padding: 0 0.7rem;
+    border-radius: 1px;
+    min-width: 4.5rem;
+    transition: width 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .bar-time {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .bar-meta {
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: baseline;
+  }
+  .diff.good { color: #2f6f4a; font-weight: 600; }
+  .diff.bad  { color: #a3543a; font-weight: 600; }
+  .dot { opacity: 0.5; }
+
+  @media (max-width: 720px) {
+    .legs-head, .legrow {
+      grid-template-columns: 1fr;
+      gap: 0.6rem;
+      padding: 1.2rem 0;
+    }
+    .legs-head { display: none; }
+    .legbar::before {
+      content: attr(data-year);
+    }
+    .legbar { padding-left: 0.25rem; border-left: 3px solid var(--c); padding-left: 0.7rem; }
+  }
+</style>
