@@ -1,0 +1,228 @@
+---
+import { RUNS } from "../lib/data";
+import { LEGS } from "../data/course";
+import { fmtSignedMin } from "../lib/format";
+
+// Per‑kilometre delta between 2026 and 2024. Negative = 2026 was faster.
+const r24 = RUNS[2024];
+const r26 = RUNS[2026];
+
+type Cell = { km: number; diff: number | null };
+
+const cells: Cell[] = Array.from({ length: 80 }, (_, i) => {
+  const k = i + 1;
+  const a = r24.km.find((b) => b.km === k);
+  const b = r26.km.find((b) => b.km === k);
+  if (!a || !b) return { km: k, diff: null };
+  return { km: k, diff: b.pace_s_per_km - a.pace_s_per_km };
+});
+
+const valid = cells.filter((c): c is Cell & { diff: number } => c.diff !== null);
+const fasterCount = valid.filter((c) => c.diff < 0).length;
+const slowerCount = valid.filter((c) => c.diff > 0).length;
+// Use the 95th percentile (absolute) so a single nuclear km doesn't flatten
+// the colour scale for the rest of the row.
+const sorted = [...valid].map((c) => Math.abs(c.diff)).sort((a, b) => a - b);
+const scaleMax = sorted[Math.floor(sorted.length * 0.95)] || 1;
+
+const totalDiff = r26.elapsedSec - r24.elapsedSec;
+
+function cellStyle(diff: number | null): string {
+  if (diff === null) return "background: var(--paper-deep);";
+  const t = Math.max(-1, Math.min(1, diff / scaleMax));
+  if (t < 0) {
+    const k = -t * 100;
+    return `background: color-mix(in oklab, var(--paper-deep) ${100 - k}%, rgb(var(--heat-fast)) ${k}%);`;
+  }
+  const k = t * 100;
+  return `background: color-mix(in oklab, var(--paper-deep) ${100 - k}%, rgb(var(--heat-slow)) ${k}%);`;
+}
+
+const ticks = [0, 11.5, 27.5, 47, 65.5, 78.5];
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Where the 65 minutes came from</p>
+    <h2 class="h2">2026 vs 2024, kilometre by kilometre.</h2>
+    <p class="prose muted">
+      Each cell is the per‑kilometre time difference. Greener is faster than
+      2024; the few warm cells are the rare kilometres where the older run
+      was actually quicker. The dark middle band is where 2026 broke even.
+    </p>
+
+    <div class="strip-wrap">
+      <div class="row">
+        <div class="lab"><span class="num">2026 − 2024</span></div>
+        <div class="cells">
+          {cells.map((c) => (
+            <div
+              class="cell"
+              style={cellStyle(c.diff)}
+              title={
+                c.diff === null
+                  ? `km ${c.km}`
+                  : `km ${c.km} · ${fmtSignedMin(c.diff)}`
+              }
+            />
+          ))}
+        </div>
+      </div>
+
+      <div class="axis">
+        <div class="lab"></div>
+        <div class="ticks">
+          {ticks.map((t) => (
+            <div class="tick" style={`--at: ${(t / 80) * 100}%;`}>
+              <span class="num">{t}</span>
+            </div>
+          ))}
+          <div class="legbar">
+            {LEGS.map((l) => {
+              const start = l.index === 1 ? 0 : LEGS[l.index - 2].cumulativeKm;
+              return (
+                <div
+                  class="legseg"
+                  style={`left: ${(start / 80) * 100}%; width: ${((l.cumulativeKm - start) / 80) * 100}%;`}
+                >
+                  <span>L{l.index}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <dl class="footers">
+        <div>
+          <dt>Faster than 2024</dt>
+          <dd class="num good">{fasterCount} of {valid.length} km</dd>
+        </div>
+        <div>
+          <dt>Slower than 2024</dt>
+          <dd class="num bad">{slowerCount} km</dd>
+        </div>
+        <div>
+          <dt>Total delta</dt>
+          <dd class="num good">{fmtSignedMin(totalDiff)}</dd>
+        </div>
+      </dl>
+
+      <div class="legend">
+        <span class="num">Faster in 2026</span>
+        <div class="grad"></div>
+        <span class="num">Slower in 2026</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .strip-wrap { margin-top: 2.5rem; }
+
+  .row {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .lab {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+  .cells {
+    display: grid;
+    grid-template-columns: repeat(80, 1fr);
+    gap: 1px;
+    height: 2.6rem;
+  }
+  .cell { height: 100%; border-radius: 1px; }
+
+  .axis {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 0.75rem;
+    margin-top: 0.6rem;
+  }
+  .ticks { position: relative; height: 2.4rem; }
+  .tick {
+    position: absolute;
+    left: var(--at);
+    top: 0;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+    font-family: var(--mono);
+    border-left: 1px solid var(--rule);
+    padding-left: 4px;
+  }
+  .legbar { position: absolute; inset: 1.4rem 0 auto 0; height: 0.95rem; }
+  .legseg {
+    position: absolute;
+    height: 100%;
+    border-left: 1px solid var(--ink-muted);
+    padding: 1px 4px 0;
+    font-size: 0.65rem;
+    font-family: var(--mono);
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+  .legseg:last-child { border-right: 1px solid var(--ink-muted); }
+
+  .footers {
+    margin: 1.75rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    gap: 2.5rem;
+    padding: 1rem 0 0;
+    border-top: 1px solid var(--rule);
+  }
+  .footers div { display: flex; flex-direction: column; gap: 0.25rem; }
+  .footers dt {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+  }
+  .footers dd {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 500;
+  }
+  .good { color: rgb(var(--heat-fast)); }
+  .bad  { color: rgb(var(--heat-slow)); }
+  @media (prefers-color-scheme: dark) {
+    .good { color: #7fcb98; }
+    .bad  { color: #e89677; }
+  }
+
+  .legend {
+    margin-top: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+  }
+  .grad {
+    flex: 0 0 14rem;
+    height: 0.4rem;
+    background: linear-gradient(
+      to right,
+      rgb(var(--heat-fast)),
+      var(--paper-deep) 50%,
+      rgb(var(--heat-slow))
+    );
+    border-radius: 1px;
+  }
+
+  @media (max-width: 640px) {
+    .row, .axis { grid-template-columns: 5rem 1fr; }
+    .lab { font-size: 0.7rem; }
+    .footers { grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
+  }
+</style>

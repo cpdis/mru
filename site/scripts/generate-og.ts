@@ -217,3 +217,80 @@ const png = resvg.render().asPng();
 const out = join(PUBLIC, "og.png");
 writeFileSync(out, png);
 console.log(`Wrote ${out} (${(png.length / 1024).toFixed(1)} KB)`);
+
+// ---------- Favicon: project the route into a 32x32 viewBox ----------
+//
+// The course shape is iconic — a vertical squiggle hugging the WA coast.
+// At 32x32 it still reads as a winding line. Use the simplified GeoJSON
+// (already what the map ships) so the favicon matches the on‑page route.
+
+const FAV = 32;
+const FAV_PAD = 4;
+const FAV_INNER = FAV - FAV_PAD * 2;
+
+// Reproject just for the favicon.
+const favScale = Math.min(
+  FAV_INNER / lonSpan,
+  FAV_INNER / latSpan
+);
+const favDrawnW = lonSpan * favScale;
+const favDrawnH = latSpan * favScale;
+const favOffsetX = FAV_PAD + (FAV_INNER - favDrawnW) / 2;
+const favOffsetY = FAV_PAD + (FAV_INNER - favDrawnH) / 2;
+
+const favPoints = line.geometry.coordinates
+  .map(([lon, lat]) => {
+    const x = favOffsetX + (lon - minLon) * cosLat * favScale;
+    const y = favOffsetY + (maxLat - lat) * favScale;
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  })
+  .join(" ");
+
+// Two‑tone favicon: forest green on transparent works in light tabs, but
+// some browsers (Safari) compose against the toolbar so the line can fade
+// out. Add a subtle dark backdrop circle for guaranteed contrast in any
+// theme, with the route on top.
+const faviconSvg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${FAV} ${FAV}">
+  <rect width="${FAV}" height="${FAV}" rx="6" fill="#0a0a0a"/>
+  <polyline points="${favPoints}" fill="none" stroke="${C2026}"
+            stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+`;
+writeFileSync(join(PUBLIC, "favicon.svg"), faviconSvg);
+console.log(`Wrote ${join(PUBLIC, "favicon.svg")}`);
+
+// Apple touch icon: 180x180 PNG of the same mark, scaled up.
+const TOUCH = 180;
+const TOUCH_PAD = 24;
+const TOUCH_INNER = TOUCH - TOUCH_PAD * 2;
+const touchScale = Math.min(TOUCH_INNER / lonSpan, TOUCH_INNER / latSpan);
+const touchDrawnW = lonSpan * touchScale;
+const touchDrawnH = latSpan * touchScale;
+const touchOffsetX = TOUCH_PAD + (TOUCH_INNER - touchDrawnW) / 2;
+const touchOffsetY = TOUCH_PAD + (TOUCH_INNER - touchDrawnH) / 2;
+const touchPoints = line.geometry.coordinates
+  .map(([lon, lat]) => {
+    const x = touchOffsetX + (lon - minLon) * cosLat * touchScale;
+    const y = touchOffsetY + (maxLat - lat) * touchScale;
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  })
+  .join(" ");
+
+const touchSvg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${TOUCH} ${TOUCH}">
+  <rect width="${TOUCH}" height="${TOUCH}" rx="36" fill="#0a0a0a"/>
+  <polyline points="${touchPoints}" fill="none" stroke="${C2026}"
+            stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+`;
+const touchPng = new Resvg(touchSvg, {
+  fitTo: { mode: "width", value: TOUCH },
+  background: "#0a0a0a",
+}).render().asPng();
+writeFileSync(join(PUBLIC, "apple-touch-icon.png"), touchPng);
+console.log(
+  `Wrote ${join(PUBLIC, "apple-touch-icon.png")} (${(
+    touchPng.length / 1024
+  ).toFixed(1)} KB)`
+);

@@ -1,9 +1,12 @@
 ---
 import "../styles/global.css";
+import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
 import Hero from "../components/Hero.astro";
 import HeadlineNumbers from "../components/HeadlineNumbers.astro";
 import CourseMapSection from "../components/CourseMapSection.astro";
 import LegSplits from "../components/LegSplits.astro";
+import DiffStrip from "../components/DiffStrip.astro";
 import PaceHeatmap from "../components/PaceHeatmap.astro";
 import HrSection from "../components/HrSection.astro";
 import TempStrip from "../components/TempStrip.astro";
@@ -15,6 +18,9 @@ import Footer from "../components/Footer.astro";
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F5F1E8" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <title>Three years of the Margaret River Ultra · Colin Dismuke</title>
@@ -51,10 +57,13 @@ import Footer from "../components/Footer.astro";
     <HeadlineNumbers />
     <CourseMapSection />
     <LegSplits />
+    <DiffStrip />
     <PaceHeatmap />
     <HrSection />
     <TempStrip />
     <ElevationSection />
     <Footer />
+    <Analytics />
+    <SpeedInsights />
   </body>
 </html>

@@ -163,7 +163,10 @@ a {
 }
 
 .lede strong {
+  /* Upright (not italic). Fraunces italic at this size renders the "3"
+   * with a flat enough top to read as "5"; the upright form is unambiguous. */
   font-weight: 700;
+  font-style: normal;
   font-variation-settings: "opsz" 144;
 }
 

@@ -16,6 +16,8 @@
   "dependencies": {
     "@astrojs/react": "^5.0.4",
     "@observablehq/plot": "^0.6.17",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "astro": "^6.3.1",
     "d3": "^7.9.0",
     "maplibre-gl": "^5.24.0",
