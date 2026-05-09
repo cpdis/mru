@@ -18,5 +18,8 @@ dist/
 # public site only ships the aggregated training.json.
 training/strava/
 training/trainingpeaks/
+
+# Remotion render outputs. Re-generate with `pnpm render` from video/.
+video/out/
 .vercel
 .env*.local

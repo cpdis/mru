@@ -1,0 +1,24 @@
+{
+  "name": "video",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render mru-reel out/mru-reel.mp4 --concurrency=4",
+    "render:fast": "remotion render mru-reel out/mru-reel-preview.mp4 --concurrency=4 --quality=70 --jpeg-quality=80"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.459",
+    "@remotion/google-fonts": "^4.0.459",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "remotion": "^4.0.459"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}
