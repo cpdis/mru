@@ -64,12 +64,18 @@ const reference = RUNS[2026];
   }
   .card {
     border: 1px solid var(--rule);
+    /* Light mode: a soft white tint against the cream paper.
+     * Dark mode: a slight lift off OLED black so the card has presence
+     * without washing the muted text into the same gray. */
     background: rgba(255, 255, 255, 0.45);
     padding: 1.25rem 1.25rem 1.5rem;
     border-radius: 2px;
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    .card { background: var(--paper-deep); }
   }
   .card header { display: flex; align-items: baseline; gap: 0.65rem; }
   .card-num {
