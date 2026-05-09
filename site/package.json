@@ -7,8 +7,8 @@
   },
   "scripts": {
     "preprocess": "tsx scripts/preprocess.ts",
-    "dev": "pnpm preprocess && astro dev",
-    "build": "pnpm preprocess && astro build",
+    "dev": "astro dev",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },

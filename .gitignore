@@ -8,8 +8,6 @@ dist/
 .env.local
 .playwright-mcp/
 
-# Preprocessed run data is generated from the GPX files at build time;
-# committing it would just create merge churn.
-site/public/data/*.json
-site/public/data/*.geojson
-!site/public/data/.gitkeep
+# The preprocessed run data lives in site/public/data and is committed so
+# the site can build without the raw GPX files in CI. Regenerate locally
+# with `pnpm preprocess` after editing GPX inputs.
