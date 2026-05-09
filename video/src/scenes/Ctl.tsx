@@ -133,15 +133,39 @@ export const Ctl: React.FC = () => {
 
         {YEARS.map(({ y, c, fromFrame }) => {
           const series = TRAINING[String(y)].ctl;
-          const progress = easeRange(frame, fromFrame, fromFrame + 90);
-          const cutoffIdx = Math.floor(series.length * progress);
+          // Slower draw + longer hold: line finishes by frame +120, then
+          // sits there for the rest of the scene.
+          const progress = easeRange(frame, fromFrame, fromFrame + 120);
+          // Fractional cutoff so the head moves smoothly between samples
+          // instead of jumping one daily point per frame.
+          const exact = series.length * progress;
+          const cutoffIdx = Math.floor(exact);
+          const tail = exact - cutoffIdx;
           if (cutoffIdx < 2) return null;
-          const slice = series.slice(0, cutoffIdx);
-          const points = slice
-            .map((p) => project(p.dayIndex, p.ctl).map((n) => n.toFixed(1)).join(","))
+
+          // Interpolate the head position between the last two points to
+          // avoid the visual stutter on the dot/label as the line grows.
+          const lastIdx = Math.min(cutoffIdx, series.length - 1);
+          const a = series[lastIdx - 1];
+          const b = series[Math.min(lastIdx, series.length - 1)];
+          const headDay = a.dayIndex + (b.dayIndex - a.dayIndex) * tail;
+          const headCtl = a.ctl + (b.ctl - a.ctl) * tail;
+          const [lx, ly] = project(headDay, headCtl);
+
+          // Render the polyline plus an interpolated final segment so the
+          // visible end matches the dot exactly, no snap on the last frame.
+          const points = [
+            ...series.slice(0, cutoffIdx).map((p) => project(p.dayIndex, p.ctl)),
+            [lx, ly],
+          ]
+            .map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`)
             .join(" ");
-          const last = slice[slice.length - 1];
-          const [lx, ly] = project(last.dayIndex, last.ctl);
+
+          // Dot fades in once we're far enough along that it won't strobe
+          // against the leading edge; label fades in slightly after.
+          const dotOp = easeRange(frame, fromFrame + 60, fromFrame + 90);
+          const labelOp = easeRange(frame, fromFrame + 95, fromFrame + 130);
+
           return (
             <g key={y}>
               <polyline
@@ -152,21 +176,18 @@ export const Ctl: React.FC = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              {progress > 0.95 && (
-                <>
-                  <circle cx={lx} cy={ly} r={10} fill={c} />
-                  <text
-                    x={lx + 18}
-                    y={ly + 10}
-                    fontFamily="Geist Mono, monospace"
-                    fontSize={32}
-                    fontWeight={700}
-                    fill={c}
-                  >
-                    {y} · {Math.round(last.ctl)}
-                  </text>
-                </>
-              )}
+              <circle cx={lx} cy={ly} r={10} fill={c} opacity={dotOp} />
+              <text
+                x={lx + 18}
+                y={ly + 10}
+                fontFamily="Geist Mono, monospace"
+                fontSize={32}
+                fontWeight={700}
+                fill={c}
+                opacity={labelOp}
+              >
+                {y} · {Math.round(b.ctl)}
+              </text>
             </g>
           );
         })}
