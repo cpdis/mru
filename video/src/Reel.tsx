@@ -1,4 +1,4 @@
-import { AbsoluteFill, Sequence } from "remotion";
+import { AbsoluteFill, Audio, Sequence, staticFile } from "remotion";
 import { loadFont as loadFraunces } from "@remotion/google-fonts/Fraunces";
 import { loadFont as loadGeist } from "@remotion/google-fonts/Geist";
 import { loadFont as loadGeistMono } from "@remotion/google-fonts/GeistMono";
@@ -22,6 +22,12 @@ loadGeistMono();
 export const Reel: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: PAPER }}>
+      {/* Backing track for local preview / non‑Instagram destinations.
+       * Scene boundaries are aligned to beats in this file, so the same
+       * cuts will line up when "Dover" is added via Instagram's audio
+       * picker on a silent upload. */}
+      <Audio src={staticFile("01 Dover.m4a")} />
+
       <Sequence from={SCENES.hook.from} durationInFrames={SCENES.hook.durationInFrames}>
         <Hook />
       </Sequence>

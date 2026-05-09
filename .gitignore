@@ -21,5 +21,12 @@ training/trainingpeaks/
 
 # Remotion render outputs. Re-generate with `pnpm render` from video/.
 video/out/
+
+# Backing music — kept local only. Add the MP3/M4A to video/public/ to
+# render with audio; Instagram users add it via the audio picker instead.
+video/public/*.mp3
+video/public/*.m4a
+video/public/*.wav
 .vercel
 .env*.local
+github-takedown.txt
