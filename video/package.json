@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "studio": "remotion studio",
-    "render": "remotion render mru-reel out/mru-reel.mp4 --concurrency=4",
-    "render:fast": "remotion render mru-reel out/mru-reel-preview.mp4 --concurrency=4 --quality=70 --jpeg-quality=80"
+    "render": "remotion render mru-reel out/mru-reel.mp4 --concurrency=4 --muted",
+    "render:music": "remotion render mru-reel out/mru-reel-music.mp4 --concurrency=4",
+    "render:fast": "remotion render mru-reel out/mru-reel-preview.mp4 --concurrency=4 --quality=70 --jpeg-quality=80 --muted"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.459",
