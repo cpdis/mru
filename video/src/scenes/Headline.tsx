@@ -1,14 +1,17 @@
-import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { C2026, FRAUNCES, H, INK, INK_MUTED, MONO } from "../tokens";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
+import { C2026, FRAUNCES, INK, INK_MUTED, MONO } from "../tokens";
 import { easeRange } from "../util";
-
-// 24–28s: the takeaway, big and clean.
 
 export const Headline: React.FC = () => {
   const frame = useCurrentFrame();
+  const { width: W, height: H } = useVideoConfig();
+  const portrait = H > W;
 
   const op1 = easeRange(frame, 0, 18);
   const op2 = easeRange(frame, 24, 42);
+
+  // Landscape can fit it on one or two lines comfortably.
+  const titleSize = portrait ? 180 : 200;
 
   return (
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
@@ -18,7 +21,7 @@ export const Headline: React.FC = () => {
             margin: 0,
             marginBottom: 60,
             fontFamily: MONO,
-            fontSize: 30,
+            fontSize: portrait ? 30 : 24,
             letterSpacing: 6,
             textTransform: "uppercase",
             color: INK_MUTED,
@@ -33,7 +36,7 @@ export const Headline: React.FC = () => {
             margin: 0,
             fontFamily: FRAUNCES,
             fontStyle: "italic",
-            fontSize: 180,
+            fontSize: titleSize,
             fontWeight: 500,
             color: INK,
             lineHeight: 0.95,
@@ -48,7 +51,7 @@ export const Headline: React.FC = () => {
             margin: "20px 0 0 0",
             fontFamily: FRAUNCES,
             fontStyle: "italic",
-            fontSize: 180,
+            fontSize: titleSize,
             fontWeight: 500,
             color: C2026,
             lineHeight: 0.95,

@@ -30,3 +30,4 @@ video/public/*.wav
 .vercel
 .env*.local
 github-takedown.txt
+twitter-thread.md

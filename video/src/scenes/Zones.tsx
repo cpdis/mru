@@ -1,21 +1,7 @@
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { TRAINING } from "../data";
-import {
-  C2024,
-  C2025,
-  C2026,
-  FRAUNCES,
-  H,
-  INK,
-  INK_MUTED,
-  MONO,
-  W,
-} from "../tokens";
+import { C2024, C2025, C2026, FRAUNCES, INK, INK_MUTED, MONO } from "../tokens";
 import { easeRange } from "../util";
-
-// 13–18s: HR zone polarisation. Three rows of stacked bars showing how
-// time in each zone shifted across years. Each row's segments grow in
-// turn — the eye reads "easy minutes climbed, hard minutes shrank".
 
 const ZONE_COLORS = ["#78aac8", "#64a55c", "#e0c066", "#e67c50", "#d7644e"];
 
@@ -24,8 +10,9 @@ const YEAR_COLOR = { 2024: C2024, 2025: C2025, 2026: C2026 } as const;
 
 export const Zones: React.FC = () => {
   const frame = useCurrentFrame();
+  const { width: W, height: H } = useVideoConfig();
+  const portrait = H > W;
 
-  // Pull totals from training.json.
   const rows = YEARS.map((y) => {
     const z = TRAINING[String(y)].totals.hrZoneMin;
     const total = z.reduce((a, b) => a + b, 0);
@@ -48,7 +35,7 @@ export const Zones: React.FC = () => {
           position: "absolute",
           left: 0,
           right: 0,
-          top: H * 0.08,
+          top: portrait ? H * 0.08 : H * 0.06,
           textAlign: "center",
           opacity: titleOp,
           padding: "0 80px",
@@ -58,7 +45,7 @@ export const Zones: React.FC = () => {
           style={{
             margin: 0,
             fontFamily: MONO,
-            fontSize: 28,
+            fontSize: portrait ? 28 : 22,
             letterSpacing: 6,
             textTransform: "uppercase",
             color: INK_MUTED,
@@ -72,7 +59,7 @@ export const Zones: React.FC = () => {
             margin: "30px 0 0",
             fontFamily: FRAUNCES,
             fontStyle: "italic",
-            fontSize: 96,
+            fontSize: portrait ? 96 : 76,
             fontWeight: 500,
             color: INK,
             lineHeight: 1,
@@ -88,26 +75,25 @@ export const Zones: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: 90,
-          right: 90,
-          top: H * 0.42,
+          left: portrait ? 90 : 140,
+          right: portrait ? 90 : 140,
+          top: portrait ? H * 0.42 : H * 0.46,
           display: "flex",
           flexDirection: "column",
-          gap: 50,
+          gap: portrait ? 50 : 30,
         }}
       >
         {rows.map((r, ri) => {
-          // Each row begins at staggered frames so they sequence in.
           const rowFrom = 18 + ri * 16;
           const rowProgress = easeRange(frame, rowFrom, rowFrom + 40);
           const widthPct = (r.total / maxTotal) * 100 * rowProgress;
           return (
-            <div key={r.year} style={{ display: "grid", gridTemplateColumns: "180px 1fr", gap: 28, alignItems: "center" }}>
+            <div key={r.year} style={{ display: "grid", gridTemplateColumns: portrait ? "180px 1fr" : "160px 1fr", gap: 28, alignItems: "center" }}>
               <div>
                 <div
                   style={{
                     fontFamily: MONO,
-                    fontSize: 28,
+                    fontSize: portrait ? 28 : 22,
                     letterSpacing: 4,
                     color: YEAR_COLOR[r.year],
                     fontWeight: 600,
@@ -118,7 +104,7 @@ export const Zones: React.FC = () => {
                 <div
                   style={{
                     fontFamily: MONO,
-                    fontSize: 36,
+                    fontSize: portrait ? 36 : 28,
                     color: INK,
                     fontWeight: 500,
                     fontVariantNumeric: "tabular-nums",
@@ -131,7 +117,7 @@ export const Zones: React.FC = () => {
                 style={{
                   display: "flex",
                   width: `${widthPct}%`,
-                  height: 70,
+                  height: portrait ? 70 : 56,
                   borderRadius: 4,
                   overflow: "hidden",
                 }}
@@ -149,7 +135,7 @@ export const Zones: React.FC = () => {
                         justifyContent: "center",
                         color: "rgba(0,0,0,0.78)",
                         fontFamily: MONO,
-                        fontSize: 22,
+                        fontSize: portrait ? 22 : 18,
                         fontWeight: 700,
                       }}
                     >
@@ -168,7 +154,7 @@ export const Zones: React.FC = () => {
           position: "absolute",
           left: 0,
           right: 0,
-          bottom: H * 0.06,
+          bottom: portrait ? H * 0.06 : H * 0.04,
           textAlign: "center",
           padding: "0 90px",
           opacity: factOp,
@@ -178,7 +164,7 @@ export const Zones: React.FC = () => {
           style={{
             margin: 0,
             fontFamily: FRAUNCES,
-            fontSize: 38,
+            fontSize: portrait ? 38 : 30,
             fontWeight: 300,
             color: INK_MUTED,
             lineHeight: 1.3,

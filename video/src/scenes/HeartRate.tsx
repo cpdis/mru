@@ -1,43 +1,38 @@
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import {
   C2024,
   C2025,
   C2026,
   FRAUNCES,
-  H,
   INK,
   INK_MUTED,
   MONO,
   PAPER_DEEP,
   RULE,
-  W,
 } from "../tokens";
 import { easeRange } from "../util";
 
-// 8–13s: the headline punch. Same average HR all three years. The visual
-// is a horizontal "scope" with three faint traces converging to one bold
-// line at 163, then the big number.
-
+// 11.7–17.4s: same average HR all three years. Three faint traces
+// converging to a flat line at the centre, with the big number on top.
 export const HeartRate: React.FC = () => {
   const frame = useCurrentFrame();
+  const { width: W, height: H } = useVideoConfig();
+  const portrait = H > W;
 
   const eyebrowOp = easeRange(frame, 0, 14);
   const numberPop = easeRange(frame, 14, 50);
   const subOp = easeRange(frame, 60, 90);
   const factOp = easeRange(frame, 90, 120);
 
-  // Three squiggle paths converging to the same horizontal line. Built
-  // procedurally using sine waves of slightly different amplitudes.
   const traceY = H * 0.5;
-  const traceLeft = 80;
-  const traceRight = W - 80;
+  const traceLeft = portrait ? 80 : 200;
+  const traceRight = W - traceLeft;
   const samples = 80;
   function trace(amp: number, phase: number, color: string, op: number) {
     const pts: string[] = [];
     for (let i = 0; i < samples; i++) {
       const t = i / (samples - 1);
       const x = traceLeft + (traceRight - traceLeft) * t;
-      // Damping converges to flat by the right end.
       const damping = 1 - t;
       const y = traceY + Math.sin(t * 14 + phase) * amp * damping;
       pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
@@ -55,6 +50,9 @@ export const HeartRate: React.FC = () => {
     );
   }
 
+  const numberSize = portrait ? 320 : 280;
+  const bpmSize = portrait ? 60 : 48;
+
   return (
     <AbsoluteFill>
       <div
@@ -62,7 +60,7 @@ export const HeartRate: React.FC = () => {
           position: "absolute",
           left: 0,
           right: 0,
-          top: H * 0.12,
+          top: portrait ? H * 0.12 : H * 0.1,
           textAlign: "center",
           opacity: eyebrowOp,
           padding: "0 80px",
@@ -72,7 +70,7 @@ export const HeartRate: React.FC = () => {
           style={{
             margin: 0,
             fontFamily: MONO,
-            fontSize: 28,
+            fontSize: portrait ? 28 : 22,
             letterSpacing: 6,
             textTransform: "uppercase",
             color: INK_MUTED,
@@ -102,7 +100,7 @@ export const HeartRate: React.FC = () => {
           position: "absolute",
           left: 0,
           right: 0,
-          top: H * 0.32,
+          top: portrait ? H * 0.32 : H * 0.22,
           textAlign: "center",
           opacity: numberPop,
           transform: `scale(${0.86 + numberPop * 0.14})`,
@@ -113,7 +111,7 @@ export const HeartRate: React.FC = () => {
           style={{
             margin: 0,
             fontFamily: MONO,
-            fontSize: 320,
+            fontSize: numberSize,
             fontWeight: 500,
             color: INK,
             lineHeight: 1,
@@ -127,7 +125,7 @@ export const HeartRate: React.FC = () => {
             margin: 0,
             marginTop: -10,
             fontFamily: MONO,
-            fontSize: 60,
+            fontSize: bpmSize,
             letterSpacing: 4,
             color: INK_MUTED,
             fontWeight: 500,
@@ -142,7 +140,7 @@ export const HeartRate: React.FC = () => {
           position: "absolute",
           left: 0,
           right: 0,
-          top: H * 0.68,
+          top: portrait ? H * 0.68 : H * 0.62,
           textAlign: "center",
           padding: "0 90px",
           opacity: subOp,
@@ -153,7 +151,7 @@ export const HeartRate: React.FC = () => {
             margin: 0,
             fontFamily: FRAUNCES,
             fontStyle: "italic",
-            fontSize: 64,
+            fontSize: portrait ? 64 : 52,
             fontWeight: 400,
             color: INK,
             lineHeight: 1.15,
@@ -168,7 +166,7 @@ export const HeartRate: React.FC = () => {
           position: "absolute",
           left: 0,
           right: 0,
-          bottom: H * 0.1,
+          bottom: portrait ? H * 0.1 : H * 0.06,
           textAlign: "center",
           padding: "0 90px",
           opacity: factOp,
@@ -179,19 +177,19 @@ export const HeartRate: React.FC = () => {
             margin: 0,
             fontFamily: FRAUNCES,
             fontStyle: "normal",
-            fontSize: 44,
+            fontSize: portrait ? 44 : 34,
             fontWeight: 300,
             color: INK_MUTED,
             lineHeight: 1.3,
           }}
         >
           Same effort.
-          <br />
+          {portrait && <br />}
+          {!portrait && " "}
           Different fitness.
         </p>
       </div>
 
-      {/* Background tint to focus the eye on the centre. */}
       <div
         style={{
           position: "absolute",

@@ -1,29 +1,20 @@
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ROUTE_2026 } from "../data";
-import {
-  C2026,
-  FRAUNCES,
-  H,
-  INK,
-  INK_MUTED,
-  MONO,
-  W,
-} from "../tokens";
+import { C2026, FRAUNCES, INK, INK_MUTED, MONO } from "../tokens";
 import { dashReveal, easeRange, projectRoute } from "../util";
 
-// 0–3s: title fades in, route line draws itself across the frame.
+// 0–~5.8s: title fades in, route line draws itself across the frame.
+// Aspect-aware: route lives centre-right in landscape, centre-vertical
+// in portrait, so the same component renders both Reels and 16:9.
 export const Hook: React.FC = () => {
   const frame = useCurrentFrame();
+  const { width: W, height: H } = useVideoConfig();
+  const portrait = H > W;
 
-  // Route box: most of the screen height, centered horizontally.
-  const routePoints = projectRoute(ROUTE_2026, {
-    x: W * 0.18,
-    y: H * 0.18,
-    w: W * 0.64,
-    h: H * 0.55,
-  });
-  // Estimate path length by summing segments. Polyline length for stroke
-  // dash reveal.
+  const routeBox = portrait
+    ? { x: W * 0.18, y: H * 0.18, w: W * 0.64, h: H * 0.55 }
+    : { x: W * 0.55, y: H * 0.1, w: W * 0.4, h: H * 0.8 };
+  const routePoints = projectRoute(ROUTE_2026, routeBox);
   const pts = routePoints.split(" ").map((p) => p.split(",").map(Number));
   let len = 0;
   for (let i = 1; i < pts.length; i++) {
@@ -35,6 +26,19 @@ export const Hook: React.FC = () => {
   const lineProgress = easeRange(frame, 6, 70);
   const titleOp = easeRange(frame, 0, 18);
   const subOp = easeRange(frame, 50, 70);
+
+  // In landscape the title block lives on the left half, vertically
+  // centred. In portrait it stays at the bottom under the route.
+  const titleBlock: React.CSSProperties = portrait
+    ? { left: 0, right: 0, top: H * 0.78, textAlign: "center", padding: "0 80px" }
+    : { left: 80, top: H * 0.36, width: W * 0.5, textAlign: "left" };
+  const eyebrowBlock: React.CSSProperties = portrait
+    ? { left: 0, right: 0, top: H * 0.08, textAlign: "center", padding: "0 80px" }
+    : { left: 80, top: H * 0.18, width: W * 0.5, textAlign: "left" };
+
+  const titleSize = portrait ? 110 : 130;
+  const subSize = portrait ? 60 : 70;
+  const eyebrowSize = portrait ? 30 : 24;
 
   return (
     <AbsoluteFill>
@@ -53,19 +57,15 @@ export const Hook: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: 0,
-          right: 0,
-          top: H * 0.08,
-          textAlign: "center",
+          ...eyebrowBlock,
           opacity: titleOp,
-          padding: "0 80px",
         }}
       >
         <p
           style={{
             margin: 0,
             fontFamily: MONO,
-            fontSize: 30,
+            fontSize: eyebrowSize,
             letterSpacing: 6,
             textTransform: "uppercase",
             color: INK_MUTED,
@@ -79,12 +79,8 @@ export const Hook: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: 0,
-          right: 0,
-          top: H * 0.78,
-          textAlign: "center",
+          ...titleBlock,
           opacity: subOp,
-          padding: "0 80px",
         }}
       >
         <h1
@@ -92,7 +88,7 @@ export const Hook: React.FC = () => {
             margin: 0,
             fontFamily: FRAUNCES,
             fontStyle: "italic",
-            fontSize: 110,
+            fontSize: titleSize,
             fontWeight: 500,
             color: INK,
             lineHeight: 1.0,
@@ -106,7 +102,7 @@ export const Hook: React.FC = () => {
             marginTop: 24,
             fontFamily: FRAUNCES,
             fontStyle: "italic",
-            fontSize: 60,
+            fontSize: subSize,
             fontWeight: 300,
             color: C2026,
           }}
