@@ -134,7 +134,6 @@ export const Zones: React.FC = () => {
                   height: 70,
                   borderRadius: 4,
                   overflow: "hidden",
-                  transition: "width 200ms",
                 }}
               >
                 {r.z.slice(0, 5).map((m, i) => {
