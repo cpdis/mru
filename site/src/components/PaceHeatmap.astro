@@ -12,28 +12,23 @@ const hi = sorted[Math.floor(sorted.length * 0.95)];
 
 const KM_TOTAL = 80;
 
-function color(p: number): string {
-  // Faster (low pace) → green. Slower (high pace) → ochre/red.
-  // Interpolate through forest → ochre → brick.
-  const t = Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
-  // 3‑stop interpolation
-  const stops: [number, [number, number, number]][] = [
-    [0.0, [63, 92, 58]], // forest
-    [0.5, [197, 168, 90]], // sand
-    [1.0, [165, 70, 50]], // brick
-  ];
-  for (let i = 0; i < stops.length - 1; i++) {
-    const [t0, c0] = stops[i];
-    const [t1, c1] = stops[i + 1];
-    if (t <= t1) {
-      const k = (t - t0) / (t1 - t0);
-      const r = Math.round(c0[0] + (c1[0] - c0[0]) * k);
-      const g = Math.round(c0[1] + (c1[1] - c0[1]) * k);
-      const b = Math.round(c0[2] + (c1[2] - c0[2]) * k);
-      return `rgb(${r} ${g} ${b})`;
-    }
+// Each cell emits a normalised value 0..1, and CSS interpolates between
+// the heat‑palette CSS vars (which swap on dark mode). Storing the raw t
+// value means dark mode just works without re‑rendering.
+function tFor(p: number): number {
+  return Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
+}
+
+function cellStyle(p: number): string {
+  const t = tFor(p);
+  // Two-stop blend: 0..0.5 fast→mid, 0.5..1 mid→slow. We use color-mix
+  // with the live --heat-* tokens so dark mode picks up its own palette.
+  if (t <= 0.5) {
+    const k = (t / 0.5) * 100;
+    return `background: color-mix(in oklab, rgb(var(--heat-fast)) ${100 - k}%, rgb(var(--heat-mid)) ${k}%);`;
   }
-  return "rgb(165 70 50)";
+  const k = ((t - 0.5) / 0.5) * 100;
+  return `background: color-mix(in oklab, rgb(var(--heat-mid)) ${100 - k}%, rgb(var(--heat-slow)) ${k}%);`;
 }
 
 // Build a fixed‑length array per year padded with nulls so all rows align.
@@ -69,7 +64,7 @@ const ticks = [0, 11.5, 27.5, 47, 65.5, 78.5, 80];
               return (
                 <div
                   class="cell"
-                  style={p === null ? "background: var(--paper-deep);" : `background: ${color(p)};`}
+                  style={p === null ? "background: var(--paper-deep);" : cellStyle(p)}
                   title={p === null ? `km ${k} · no data` : `km ${k} · ${fmtPace(p)}/km`}
                 />
               );
@@ -183,7 +178,10 @@ const ticks = [0, 11.5, 27.5, 47, 65.5, 78.5, 80];
   .grad {
     flex: 0 0 16rem;
     height: 0.4rem;
-    background: linear-gradient(to right, rgb(63 92 58), rgb(197 168 90), rgb(165 70 50));
+    background: linear-gradient(to right,
+      rgb(var(--heat-fast)),
+      rgb(var(--heat-mid)),
+      rgb(var(--heat-slow)));
     border-radius: 1px;
   }
 

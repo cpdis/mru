@@ -16,9 +16,19 @@ export default function ElevationProfile({ reference }: Props) {
     if (!ref.current) return;
     const el = ref.current;
 
+    const readVar = (name: string, fallback: string) => {
+      const v = getComputedStyle(document.documentElement)
+        .getPropertyValue(name)
+        .trim();
+      return v || fallback;
+    };
+
     const draw = () => {
       el.innerHTML = "";
       const w = el.clientWidth;
+      const inkMuted = readVar("--ink-muted", "#5a574e");
+      const rule = readVar("--rule", "#c9c1ad");
+      const c2026 = readVar("--c-2026", "#3F5C3A");
       const profile = reference.km.map((b) => ({ km: b.km, ele: b.ele }));
       const aid = LEGS.map((l, i) => ({
         km: i === 0 ? 0 : LEGS[i - 1].cumulativeKm,
@@ -38,7 +48,7 @@ export default function ElevationProfile({ reference }: Props) {
           background: "transparent",
           fontFamily: "Geist Mono, ui-monospace, monospace",
           fontSize: "11px",
-          color: "#5a574e",
+          color: inkMuted,
         },
         x: { domain: [0, 80], label: "Distance (km) →", ticks: [0, 11.5, 27.5, 47, 65.5, 78.5] },
         y: { label: "Elevation (m) ↑", grid: true },
@@ -46,19 +56,19 @@ export default function ElevationProfile({ reference }: Props) {
           Plot.areaY(profile, {
             x: "km",
             y: "ele",
-            fill: "#3F5C3A",
-            fillOpacity: 0.16,
+            fill: c2026,
+            fillOpacity: 0.18,
             curve: "monotone-x",
           }),
           Plot.lineY(profile, {
             x: "km",
             y: "ele",
-            stroke: "#3F5C3A",
+            stroke: c2026,
             strokeWidth: 1.4,
             curve: "monotone-x",
           }),
           Plot.ruleX(aid.slice(1).map((a) => a.km), {
-            stroke: "#c9c1ad",
+            stroke: rule,
             strokeDasharray: "2,3",
           }),
           Plot.text(aid, {
@@ -67,7 +77,7 @@ export default function ElevationProfile({ reference }: Props) {
             text: (d: any) => `L${d.leg}`,
             fontFamily: "Geist Mono",
             fontWeight: 600,
-            fill: "#5a574e",
+            fill: inkMuted,
             dy: -2,
           }),
         ],
@@ -78,7 +88,12 @@ export default function ElevationProfile({ reference }: Props) {
     draw();
     const ro = new ResizeObserver(draw);
     ro.observe(el);
-    return () => ro.disconnect();
+    const mql = matchMedia("(prefers-color-scheme: dark)");
+    mql.addEventListener("change", draw);
+    return () => {
+      ro.disconnect();
+      mql.removeEventListener("change", draw);
+    };
   }, [reference]);
 
   return <div ref={ref} className="elevation-profile" />;

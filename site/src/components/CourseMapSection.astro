@@ -22,7 +22,7 @@ const r = RUNS[2026];
         client:load
         geojsonUrl="/data/tracks.geojson"
         aidStations={r.aidStations}
-        routeColor="#3F5C3A"
+        routeCssVar="--c-2026"
         year={2026}
       />
     </div>
@@ -37,10 +37,12 @@ const r = RUNS[2026];
     overflow: hidden;
   }
   .maplibregl-ctrl-attrib {
-    background: rgba(245, 241, 232, 0.7);
+    background: color-mix(in oklab, var(--paper) 80%, transparent);
     font-family: var(--mono), ui-monospace, monospace;
     font-size: 10px;
+    color: var(--ink-muted);
   }
+  .maplibregl-ctrl-attrib a { color: var(--ink); }
   .aid-marker {
     display: flex;
     align-items: center;
@@ -53,25 +55,26 @@ const r = RUNS[2026];
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #1a1a1a;
-    box-shadow: 0 0 0 3px rgba(245, 241, 232, 0.95);
+    background: var(--ink);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--paper) 90%, transparent);
   }
   .aid-marker .aid-label {
     font-family: "Geist", system-ui, sans-serif;
     font-size: 0.74rem;
     font-weight: 600;
-    color: #1a1a1a;
-    background: rgba(245, 241, 232, 0.9);
-    border: 1px solid #c9c1ad;
+    color: var(--ink);
+    background: color-mix(in oklab, var(--paper) 88%, transparent);
+    border: 1px solid var(--rule);
     padding: 2px 6px;
     border-radius: 2px;
     white-space: nowrap;
     line-height: 1.2;
+    backdrop-filter: blur(2px);
   }
   .aid-marker .aid-km {
     font-family: "Geist Mono", ui-monospace, monospace;
     font-weight: 500;
-    color: #5a574e;
+    color: var(--ink-muted);
     font-size: 0.65rem;
   }
 </style>

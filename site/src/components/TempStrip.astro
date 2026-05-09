@@ -5,26 +5,14 @@ const allTemps = YEARS.flatMap((y) => RUNS[y].km.map((b) => b.temp ?? null).filt
 const tMin = Math.floor(Math.min(...allTemps));
 const tMax = Math.ceil(Math.max(...allTemps));
 
-function color(t: number): string {
-  // cool blue → warm ochre
+function cellStyle(t: number): string {
   const k = Math.max(0, Math.min(1, (t - tMin) / (tMax - tMin)));
-  const stops: [number, [number, number, number]][] = [
-    [0.0, [88, 122, 142]], // cool
-    [0.5, [197, 168, 90]], // warm sand
-    [1.0, [165, 90, 50]], // hot ochre
-  ];
-  for (let i = 0; i < stops.length - 1; i++) {
-    const [t0, c0] = stops[i];
-    const [t1, c1] = stops[i + 1];
-    if (k <= t1) {
-      const a = (k - t0) / (t1 - t0);
-      const r = Math.round(c0[0] + (c1[0] - c0[0]) * a);
-      const g = Math.round(c0[1] + (c1[1] - c0[1]) * a);
-      const b = Math.round(c0[2] + (c1[2] - c0[2]) * a);
-      return `rgb(${r} ${g} ${b})`;
-    }
+  if (k <= 0.5) {
+    const a = (k / 0.5) * 100;
+    return `background: color-mix(in oklab, rgb(var(--temp-cool)) ${100 - a}%, rgb(var(--temp-mid)) ${a}%);`;
   }
-  return "rgb(165 90 50)";
+  const a = ((k - 0.5) / 0.5) * 100;
+  return `background: color-mix(in oklab, rgb(var(--temp-mid)) ${100 - a}%, rgb(var(--temp-hot)) ${a}%);`;
 }
 ---
 
@@ -53,7 +41,7 @@ function color(t: number): string {
                 return (
                   <div
                     class="cell"
-                    style={t === null ? "background: var(--paper-deep);" : `background: ${color(t)};`}
+                    style={t === null ? "background: var(--paper-deep);" : cellStyle(t)}
                     title={t === null ? `km ${k}` : `km ${k} · ${t.toFixed(1)}°C`}
                   />
                 );
@@ -105,7 +93,10 @@ function color(t: number): string {
   .grad {
     flex: 0 0 10rem;
     height: 0.35rem;
-    background: linear-gradient(to right, rgb(88 122 142), rgb(197 168 90), rgb(165 90 50));
+    background: linear-gradient(to right,
+      rgb(var(--temp-cool)),
+      rgb(var(--temp-mid)),
+      rgb(var(--temp-hot)));
     border-radius: 1px;
   }
   @media (max-width: 640px) {

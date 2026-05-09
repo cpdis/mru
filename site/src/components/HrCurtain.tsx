@@ -16,16 +16,32 @@ export default function HrCurtain({ runs }: Props) {
     if (!ref.current) return;
     const el = ref.current;
 
+    const readVar = (name: string, fallback: string) => {
+      const v = getComputedStyle(document.documentElement)
+        .getPropertyValue(name)
+        .trim();
+      return v || fallback;
+    };
+
     const draw = () => {
       el.innerHTML = "";
       const w = el.clientWidth;
+      // Read live theme tokens so axes/grid/labels follow the page theme.
+      const inkMuted = readVar("--ink-muted", "#5a574e");
+      const rule = readVar("--rule", "#c9c1ad");
+      const paper = readVar("--paper", "#F5F1E8");
+      const c2024 = readVar("--c-2024", "#C5743F");
+      const c2025 = readVar("--c-2025", "#2F6F6B");
+      const c2026 = readVar("--c-2026", "#3F5C3A");
+      const yearColor = (y: number) =>
+        y === 2024 ? c2024 : y === 2025 ? c2025 : c2026;
 
       const points = runs.flatMap((r) =>
         r.km
           .filter((b) => b.hr !== null)
           .map((b) => ({
             year: String(r.year),
-            color: r.color,
+            color: yearColor(r.year),
             km: b.km,
             hr: b.hr as number,
           }))
@@ -44,7 +60,7 @@ export default function HrCurtain({ runs }: Props) {
           background: "transparent",
           fontFamily: "Geist Mono, ui-monospace, monospace",
           fontSize: "11px",
-          color: "#5a574e",
+          color: inkMuted,
         },
         x: {
           label: "Distance (km) →",
@@ -62,7 +78,7 @@ export default function HrCurtain({ runs }: Props) {
         marks: [
           // Aid station guides
           Plot.ruleX(aid, {
-            stroke: "#c9c1ad",
+            stroke: rule,
             strokeDasharray: "2,3",
           }),
           // HR lines
@@ -99,11 +115,11 @@ export default function HrCurtain({ runs }: Props) {
                 dx: 0,
                 dy: 0,
                 fontWeight: 700,
-                fill: r.color,
+                fill: yearColor(r.year),
                 textAnchor: "middle",
                 fontFamily: "Geist Mono",
                 fontSize: 12,
-                stroke: "#F5F1E8",
+                stroke: paper,
                 strokeWidth: 4,
                 paintOrder: "stroke",
               }
@@ -117,7 +133,12 @@ export default function HrCurtain({ runs }: Props) {
     draw();
     const ro = new ResizeObserver(draw);
     ro.observe(el);
-    return () => ro.disconnect();
+    const mql = matchMedia("(prefers-color-scheme: dark)");
+    mql.addEventListener("change", draw);
+    return () => {
+      ro.disconnect();
+      mql.removeEventListener("change", draw);
+    };
   }, [runs]);
 
   return <div ref={ref} className="hr-curtain" />;
