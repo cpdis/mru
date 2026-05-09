@@ -1,0 +1,114 @@
+---
+import { TRAINING, TRAINING_YEARS } from "../../lib/training";
+
+const rows = [
+  {
+    label: "Total TSS",
+    values: TRAINING_YEARS.map((y) => TRAINING[y].totals.tss.toLocaleString()),
+  },
+  {
+    label: "Run kilometres",
+    values: TRAINING_YEARS.map((y) => TRAINING[y].totals.runKm.toFixed(0)),
+  },
+  {
+    label: "Run hours",
+    values: TRAINING_YEARS.map((y) => TRAINING[y].totals.runHours.toFixed(0)),
+  },
+  {
+    label: "Bike rides",
+    values: TRAINING_YEARS.map((y) => String(TRAINING[y].totals.rides)),
+  },
+  {
+    label: "Bike kilometres",
+    values: TRAINING_YEARS.map((y) =>
+      Math.round(TRAINING[y].totals.rideKm).toLocaleString()
+    ),
+  },
+  {
+    label: "Total moving hours",
+    values: TRAINING_YEARS.map((y) => TRAINING[y].totals.movingHoursAll.toFixed(0)),
+  },
+  {
+    label: "Z1 minutes",
+    values: TRAINING_YEARS.map((y) =>
+      TRAINING[y].totals.hrZoneMin[0].toLocaleString()
+    ),
+  },
+  {
+    label: "Z5 minutes",
+    values: TRAINING_YEARS.map((y) =>
+      TRAINING[y].totals.hrZoneMin[4].toLocaleString()
+    ),
+  },
+];
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Year by year</p>
+    <h2 class="h2">All the numbers, side by side.</h2>
+
+    <div class="table">
+      <div class="thead">
+        <div></div>
+        {TRAINING_YEARS.map((y) => (
+          <div class="th" style={`--c: var(--c-${y});`}>
+            <span class="num">{y}</span>
+          </div>
+        ))}
+      </div>
+      {rows.map((r) => (
+        <div class="tr">
+          <div class="th-row">{r.label}</div>
+          {r.values.map((v, i) => (
+            <div class="td" style={`--c: var(--c-${TRAINING_YEARS[i]});`}>
+              <span class="v num">{v}</span>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .table { margin-top: 2.5rem; border-top: 1px solid var(--rule); }
+  .thead, .tr {
+    display: grid;
+    grid-template-columns: minmax(8rem, 1.4fr) repeat(3, 1fr);
+    gap: clamp(0.5rem, 2vw, 1.5rem);
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .thead {
+    border-bottom-color: var(--ink);
+    padding-bottom: 0.5rem;
+  }
+  .th {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--c);
+    font-weight: 600;
+  }
+  .th-row {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.05rem;
+    color: var(--ink-muted);
+  }
+  .v {
+    font-size: clamp(1rem, 1.6vw, 1.3rem);
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .td:nth-child(4) .v { color: var(--c); }
+  @media (max-width: 640px) {
+    .thead, .tr { grid-template-columns: minmax(6rem, 1fr) repeat(3, 1fr); font-size: 0.95rem; }
+    .th-row { font-size: 0.95rem; }
+    .v { font-size: 1rem; }
+  }
+</style>

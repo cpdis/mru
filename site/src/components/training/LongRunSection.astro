@@ -1,0 +1,39 @@
+---
+import LongRunChart from "./LongRunChart";
+import { TRAINING, TRAINING_YEARS } from "../../lib/training";
+
+const series = TRAINING_YEARS.map((y) => ({
+  year: y,
+  cssVar: `--c-${y}`,
+  weeks: TRAINING[y].weeks.map((w) => ({
+    weekIndex: w.weekIndex,
+    longRunKm: w.longRunKm,
+  })),
+}));
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Long run progression</p>
+    <h2 class="h2">Built up, then held there.</h2>
+    <p class="prose muted">
+      Longest single run each week, plotted by weeks before race day so the
+      three years line up at the finish. The 2026 build ramps to a stable
+      40‑45 km block from week −7 onward — the most consistent ultra‑specific
+      stretch of any year.
+    </p>
+
+    <div class="chart">
+      <LongRunChart client:visible series={series} />
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .longrun-chart {
+    width: 100%;
+    margin-top: 2rem;
+    border-top: 1px solid var(--rule);
+    padding-top: 1rem;
+  }
+</style>

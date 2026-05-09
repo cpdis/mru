@@ -7,6 +7,7 @@
   },
   "scripts": {
     "preprocess": "tsx scripts/preprocess.ts",
+    "preprocess:training": "tsx scripts/preprocess-training.ts",
     "og": "tsx scripts/generate-og.ts",
     "dev": "astro dev",
     "build": "astro build",
@@ -31,6 +32,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/suncalc": "^1.9.2",
+    "csv-parse": "^6.2.1",
     "sharp": "^0.34.5",
     "tsx": "^4.21.0"
   }

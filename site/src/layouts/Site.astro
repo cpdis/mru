@@ -1,0 +1,57 @@
+---
+import "../styles/global.css";
+import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+
+type Props = {
+  title: string;
+  description: string;
+  ogTitle?: string;
+  ogDescription?: string;
+};
+
+const {
+  title,
+  description,
+  ogTitle = "Three years on the Cape to Cape",
+  ogDescription = "Same course. Same heart rate. Sixty‑five minutes faster. Three runs of the 80 km Margaret River Ultra.",
+} = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F5F1E8" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={`https://mru.cpd.dev${Astro.url.pathname}`} />
+    <meta property="og:site_name" content="mru.cpd.dev" />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:image" content="https://mru.cpd.dev/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Map of the 80 km Margaret River Ultra course with finish times of 8:34, 8:04, and 7:29 across 2024, 2025, and 2026." />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={ogTitle} />
+    <meta name="twitter:description" content={ogDescription} />
+    <meta name="twitter:image" content="https://mru.cpd.dev/og.png" />
+  </head>
+  <body>
+    <Nav />
+    <slot />
+    <Footer />
+    <Analytics />
+    <SpeedInsights />
+  </body>
+</html>

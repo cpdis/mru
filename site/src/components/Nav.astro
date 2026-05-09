@@ -1,0 +1,77 @@
+---
+const path = Astro.url.pathname;
+const onRace = path === "/" || path === "";
+const onTraining = path.startsWith("/training");
+---
+
+<header class="nav">
+  <div class="wrap nav-wrap">
+    <a href="/" class="brand" aria-label="mru.cpd.dev home">
+      <span class="brand-dot" style="background: var(--c-2026);" aria-hidden="true"></span>
+      <span class="brand-text num">mru.cpd.dev</span>
+    </a>
+
+    <nav class="tabs" aria-label="Sections">
+      <a href="/" class:list={["tab", onRace && "active"]} aria-current={onRace ? "page" : undefined}>Race</a>
+      <a href="/training/" class:list={["tab", onTraining && "active"]} aria-current={onTraining ? "page" : undefined}>Training</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(10px);
+    background: color-mix(in oklab, var(--paper) 85%, transparent);
+    border-bottom: 1px solid var(--rule);
+  }
+  .nav-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .brand-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .brand-text {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .tabs { display: flex; gap: 0.25rem; }
+  .tab {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-muted);
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    transition: color 150ms, background 150ms, border-color 150ms;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active {
+    color: var(--ink);
+    background: var(--paper-deep);
+    border-color: var(--rule);
+  }
+</style>

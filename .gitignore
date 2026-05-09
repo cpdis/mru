@@ -11,3 +11,12 @@ dist/
 # The preprocessed run data lives in site/public/data and is committed so
 # the site can build without the raw GPX files in CI. Regenerate locally
 # with `pnpm preprocess` after editing GPX inputs.
+
+# Personal training exports — Strava bulk archives include private DMs,
+# logins, contacts, support tickets, and device identifiers. TrainingPeaks
+# CSVs include athlete/coach comments. Keep all of this local-only; the
+# public site only ships the aggregated training.json.
+training/strava/
+training/trainingpeaks/
+.vercel
+.env*.local

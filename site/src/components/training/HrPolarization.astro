@@ -1,0 +1,161 @@
+---
+import { TRAINING, TRAINING_YEARS } from "../../lib/training";
+
+// HR zone time per year. Show as a stacked horizontal bar, one row per
+// year, segments coloured by zone. Reads directly off TrainingPeaks zone
+// totals.
+const ZONE_LABELS = ["Z1", "Z2", "Z3", "Z4", "Z5"];
+// Cool → warm: easier zones in cool blues/greens, hard zones in warm reds.
+// Uses the existing temp palette so it picks up dark mode.
+const ZONE_COLOR = [
+  "rgb(var(--temp-cool))",
+  "rgb(var(--heat-fast))",
+  "rgb(var(--heat-mid))",
+  "rgb(var(--temp-hot))",
+  "rgb(var(--heat-slow))",
+];
+
+const rows = TRAINING_YEARS.map((y) => {
+  const z = TRAINING[y].totals.hrZoneMin;
+  const total = z.reduce((a, b) => a + b, 0);
+  return { year: y, total, z };
+});
+const maxTotal = Math.max(...rows.map((r) => r.total));
+
+function fmtHrs(min: number): string {
+  const h = Math.floor(min / 60);
+  return h > 0 ? `${h}h` : `${Math.round(min)}m`;
+}
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Polarisation · TrainingPeaks HR zones</p>
+    <h2 class="h2">Easy time tripled. Hard time halved.</h2>
+    <p class="prose muted">
+      Time spent in each TrainingPeaks heart‑rate zone, summed across every
+      Jan→race workout. Bars are scaled to the largest year so you can read
+      the absolute volume change as well as the mix.
+    </p>
+
+    <div class="hrz">
+      <div class="legend">
+        {ZONE_LABELS.map((l, i) => (
+          <span class="key">
+            <i style={`background: ${ZONE_COLOR[i]};`}></i>
+            <span class="num">{l}</span>
+          </span>
+        ))}
+      </div>
+
+      {rows.map((r) => (
+        <div class="row">
+          <div class="rowhead">
+            <span class="num year">{r.year}</span>
+            <span class="num total">{fmtHrs(r.total)}</span>
+          </div>
+          <div class="bar" style={`width: ${(r.total / maxTotal) * 100}%;`}>
+            {r.z.map((m, i) => (
+              <div
+                class="seg"
+                style={`flex: ${m}; background: ${ZONE_COLOR[i]};`}
+                title={`${ZONE_LABELS[i]} · ${fmtHrs(m)}`}
+              >
+                {m / r.total > 0.06 && (
+                  <span class="seglab num">{Math.round((m / r.total) * 100)}%</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <p class="prose muted note">
+      Z1 minutes climbed from <span class="num">{rows[0].z[0]}</span> in 2024
+      to <span class="num">{rows[2].z[0]}</span> in 2026 — almost three times
+      as much easy aerobic time. Z5 dropped from <span class="num">{rows[0].z[4]}</span>
+      to <span class="num">{rows[2].z[4]}</span> minutes. The middle zones
+      barely changed. That's the polarised model.
+    </p>
+  </div>
+</section>
+
+<style>
+  .hrz { margin-top: 2.5rem; }
+  .legend {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .key {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.16em;
+    font-weight: 600;
+  }
+  .key i {
+    width: 14px;
+    height: 4px;
+    border-radius: 1px;
+    display: inline-block;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 8.5rem 1fr;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.7rem 0;
+    border-top: 1px solid var(--rule);
+  }
+  .row:last-of-type { border-bottom: 1px solid var(--rule); }
+  .rowhead {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .year {
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+  .total {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .bar {
+    display: flex;
+    height: 2.4rem;
+    border-radius: 2px;
+    overflow: hidden;
+    transition: width 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .seg {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 0.45rem;
+    color: rgba(0, 0, 0, 0.78);
+    min-width: 0;
+  }
+  @media (prefers-color-scheme: dark) {
+    .seg { color: rgba(0, 0, 0, 0.85); }
+  }
+  .seglab {
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  .note { margin-top: 2rem; }
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 5rem 1fr; }
+    .total { font-size: 1.05rem; }
+  }
+</style>

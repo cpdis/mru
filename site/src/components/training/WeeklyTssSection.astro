@@ -1,0 +1,38 @@
+---
+import WeeklyTss from "./WeeklyTss";
+import { TRAINING, TRAINING_YEARS } from "../../lib/training";
+
+const series = TRAINING_YEARS.map((y) => ({
+  year: y,
+  cssVar: `--c-${y}`,
+  weeks: TRAINING[y].weeks.map((w) => ({
+    weekIndex: w.weekIndex,
+    tss: w.tss,
+  })),
+}));
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Weekly TSS · raw load</p>
+    <h2 class="h2">Bigger weeks, more often.</h2>
+    <p class="prose muted">
+      The same data CTL is averaging — week‑by‑week training stress, no
+      smoothing. The 2026 line sits ~50% higher than 2024 for the entire
+      block, with a much shorter taper before race week.
+    </p>
+
+    <div class="chart">
+      <WeeklyTss client:visible series={series} />
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .weekly-tss {
+    width: 100%;
+    margin-top: 2rem;
+    border-top: 1px solid var(--rule);
+    padding-top: 1rem;
+  }
+</style>

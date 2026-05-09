@@ -1,0 +1,42 @@
+---
+import CtlChart from "./CtlChart";
+import { TRAINING, TRAINING_YEARS } from "../../lib/training";
+
+const series = TRAINING_YEARS.map((y) => ({
+  year: y,
+  cssVar: `--c-${y}`,
+  ctl: TRAINING[y].ctl.map((p) => ({ dayIndex: p.dayIndex, ctl: p.ctl })),
+}));
+
+const peaks = TRAINING_YEARS.map((y) => ({
+  year: y,
+  ctl: Math.max(...TRAINING[y].ctl.map((p) => p.ctl)),
+}));
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Fitness curve · CTL</p>
+    <h2 class="h2">A higher floor each year.</h2>
+    <p class="prose muted">
+      Chronic Training Load is a 42‑day exponential moving average of daily
+      training stress. It's the closest single number we have for "aerobic
+      fitness right now". Each year started higher than the last, and 2026
+      built to a peak of <span class="num">{peaks[2].ctl.toFixed(0)}</span>
+      vs <span class="num">{peaks[0].ctl.toFixed(0)}</span> in 2024.
+    </p>
+
+    <div class="chart">
+      <CtlChart client:visible series={series} />
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .ctl-chart {
+    width: 100%;
+    margin-top: 2rem;
+    border-top: 1px solid var(--rule);
+    padding-top: 1rem;
+  }
+</style>

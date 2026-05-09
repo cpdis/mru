@@ -1,0 +1,98 @@
+---
+import { TRAINING, TRAINING_YEARS } from "../../lib/training";
+
+const r24 = TRAINING[2024];
+const r26 = TRAINING[2026];
+
+const z1Mult = (r26.totals.hrZoneMin[0] / r24.totals.hrZoneMin[0]).toFixed(1);
+const z5Drop = Math.round(
+  (1 - r26.totals.hrZoneMin[4] / r24.totals.hrZoneMin[4]) * 100
+);
+const tssGain = Math.round(((r26.totals.tss - r24.totals.tss) / r24.totals.tss) * 100);
+---
+
+<section class="hero topo">
+  <div class="wrap">
+    <p class="eyebrow">The training behind the runs</p>
+
+    <h1 class="display">
+      <span class="line line-1">I trained</span>
+      <span class="line line-2">slower to get</span>
+      <span class="line line-3">faster.</span>
+    </h1>
+
+    <div class="stats">
+      <div class="stat" style="--c: var(--c-2026);">
+        <span class="num val">{z1Mult}×</span>
+        <span class="lab">easy aerobic minutes (Z1) by 2026</span>
+      </div>
+      <div class="stat" style="--c: var(--c-2024);">
+        <span class="num val">−{z5Drop}%</span>
+        <span class="lab">hard high‑intensity minutes (Z5)</span>
+      </div>
+      <div class="stat" style="--c: var(--c-2025);">
+        <span class="num val">+{tssGain}%</span>
+        <span class="lab">total training stress, Jan → race</span>
+      </div>
+    </div>
+
+    <p class="prose muted">
+      Three Jan‑to‑race blocks, side by side. {TRAINING_YEARS.length} years of
+      Strava and TrainingPeaks data. Same race every May, but the training
+      that produced each finish was very different — and the shape of the
+      change is the textbook polarised aerobic model.
+    </p>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: clamp(4rem, 9vw, 7rem) 0 clamp(3rem, 6vw, 5rem);
+    border-bottom: 1px solid var(--rule);
+  }
+  .display {
+    font-size: clamp(2.6rem, 7vw, 5.5rem);
+    margin-bottom: 2.5rem;
+  }
+  .display .line { display: block; }
+  .display .line-2 {
+    margin-left: clamp(1rem, 4vw, 4rem);
+    font-style: normal;
+    font-weight: 300;
+  }
+  .display .line-3 { color: var(--c-2026); }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.75rem, 2vw, 2rem);
+    margin: 0 0 2.5rem;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    border-left: 3px solid var(--c);
+    padding: 0.4rem 0 0.4rem 0.85rem;
+  }
+  .val {
+    font-family: var(--mono);
+    font-feature-settings: "tnum" 1;
+    font-size: clamp(1.7rem, 4.2vw, 3rem);
+    font-weight: 500;
+    color: var(--c);
+    line-height: 1;
+  }
+  .lab {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+    line-height: 1.3;
+    color: var(--ink-muted);
+    max-width: 22ch;
+  }
+  @media (max-width: 720px) {
+    .stats { grid-template-columns: 1fr; }
+  }
+</style>
