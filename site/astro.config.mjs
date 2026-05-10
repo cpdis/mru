@@ -8,8 +8,9 @@ import vercel from '@astrojs/vercel';
 export default defineConfig({
   integrations: [react()],
   adapter: vercel({
-    webAnalytics: {
-      enabled: true,
-    },
+    // Auto-inject the Vercel Web Analytics + Speed Insights scripts on
+    // every page, replacing the previous per-layout components.
+    webAnalytics: { enabled: true },
+    speedInsights: { enabled: true },
   }),
 });
