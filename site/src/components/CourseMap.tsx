@@ -1,5 +1,8 @@
 import { useEffect, useRef } from "react";
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
+// MapLibre 6 finds its worker relative to its own module, which breaks once
+// Vite bundles it; hand it the emitted worker file instead.
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 type Aid = { name: string; km: number; lat: number; lon: number };
@@ -48,6 +51,7 @@ export default function CourseMap({
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
 
+    maplibregl.setWorkerUrl(maplibreWorkerUrl);
     const map = new maplibregl.Map({
       container: ref.current,
       style: preferredStyle(),
